@@ -7,17 +7,16 @@ import net.eq2online.macros.scripting.api.IScriptActionProvider;
 import net.eq2online.macros.scripting.api.IMacro;
 import net.eq2online.macros.scripting.api.IMacroAction;
 import net.eq2online.macros.scripting.api.IReturnValue;
-import net.eq2online.macros.scripting.ReturnValueChat;
 import net.eq2online.macros.scripting.api.APIVersion;
 
 @APIVersion(18)
-public class ScriptActionEnchantTest extends ScriptAction {
+public class ScriptActionEnchant extends ScriptAction {
 
-    public ScriptActionEnchantTest() {
+    public ScriptActionEnchant() {
         this(ScriptContext.MAIN);
     }
 
-    public ScriptActionEnchantTest(final ScriptContext context) {
+    public ScriptActionEnchant(final ScriptContext context) {
         super(context, "enchant");
     }
 
@@ -27,8 +26,17 @@ public class ScriptActionEnchantTest extends ScriptAction {
             IMacro macro,
             IMacroAction action,
             String rawParams,
-            String[] params
-    ) {
+            String[] params) {
+        try {
+            Class<?> minecraftClass = Class.forName("net.minecraft.client.Minecraft");
+
+            provider.actionAddChatMessage(
+                    "Minecraft class found: " + minecraftClass.getName());
+        } catch (Exception e) {
+            provider.actionAddChatMessage(
+                    "Minecraft access failed: " + e.getClass().getName());
+        }
+
         if (params.length != 1) {
             provider.actionAddChatMessage("Uso: enchant(1), enchant(2) ou enchant(3)");
             return null;
