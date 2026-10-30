@@ -8,27 +8,10 @@ import net.eq2online.macros.scripting.api.IMacro;
 import net.eq2online.macros.scripting.api.IMacroAction;
 import net.eq2online.macros.scripting.api.IReturnValue;
 
-import java.io.IOException;
-import java.util.logging.FileHandler;
-import java.util.logging.SimpleFormatter;
-
 import net.eq2online.macros.scripting.api.APIVersion;
 
 @APIVersion(18)
 public class ScriptActionEnchant extends ScriptAction {
-    private static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger("EnchantAddon");
-
-    static {
-        try {
-            FileHandler handler = new FileHandler("enchant-addon.log", true);
-            handler.setFormatter(new SimpleFormatter());
-
-            LOGGER.addHandler(handler);
-            LOGGER.setUseParentHandlers(false);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     public ScriptActionEnchant() {
         this(ScriptContext.MAIN);
@@ -38,8 +21,12 @@ public class ScriptActionEnchant extends ScriptAction {
         super(context, "enchant");
     }
 
-    // net.minecraft.client.Minecraft
-    // func_71410_x
+    private static final String MINECRAFT_CLASS = "net.minecraft.client.Minecraft";
+    private static final String MINECRAFT_CLASS_GET_FUNC = "func_71410_x";
+
+    private static final String PLAYER_CONTROLLER_CLASS = "net.minecraft.client.multiplayer.PlayerControllerMP";
+
+    private static final String ENCHANTMENT_CONTAINER_CLASS = "net.minecraft.inventory.ContainerEnchantment";
 
     @Override
     public IReturnValue execute(
@@ -50,17 +37,12 @@ public class ScriptActionEnchant extends ScriptAction {
             String[] params) {
 
         try {
-            int option = Integer.parseInt(params[0]);
+            int option = parseOption(params);
 
-            if (option < 1 || option > 3) {
-                provider.actionAddChatMessage("Opção inválida de encantamento: " + option);
-                return null;
-            }
-
-            Class<?> minecraftClass = Class.forName("net.minecraft.client.Minecraft");
+            Class<?> minecraftClass = Class.forName(MINECRAFT_CLASS);
 
             Object minecraft = minecraftClass
-                    .getMethod("func_71410_x")
+                    .getMethod(MINECRAFT_CLASS_GET_FUNC)
                     .invoke(null);
 
             // Get player
@@ -76,7 +58,7 @@ public class ScriptActionEnchant extends ScriptAction {
 
             // Ensure an enchantment table is open
             if (!container.getClass().getName().equals(
-                    "net.minecraft.inventory.ContainerEnchantment")) {
+                    ENCHANTMENT_CONTAINER_CLASS)) {
                 provider.actionAddChatMessage("Mesa de encantamento não está aberta");
                 return null;
             }
@@ -86,8 +68,6 @@ public class ScriptActionEnchant extends ScriptAction {
 
             int windowId = windowIdField.getInt(container);
 
-            provider.actionAddChatMessage("windowId: " + windowId);
-
             // Get controller
             java.lang.reflect.Field controllerField = minecraftClass.getDeclaredField("field_71442_b");
             controllerField.setAccessible(true);
@@ -95,8 +75,7 @@ public class ScriptActionEnchant extends ScriptAction {
             Object controller = controllerField.get(minecraft);
 
             // Invoke enchantment selection
-            Class<?> controllerClass = Class.forName(
-                    "net.minecraft.client.multiplayer.PlayerControllerMP");
+            Class<?> controllerClass = Class.forName(PLAYER_CONTROLLER_CLASS);
 
             java.lang.reflect.Method enchantMethod = controllerClass.getDeclaredMethod(
                     "func_78756_a",
@@ -109,7 +88,7 @@ public class ScriptActionEnchant extends ScriptAction {
             provider.actionAddChatMessage("Encantamento: " + option);
 
         } catch (Exception e) {
-            provider.actionAddChatMessage("Enchantment error: " + e);
+            provider.actionAddChatMessage("Error: " + e);
         }
 
         return null;
@@ -118,5 +97,21 @@ public class ScriptActionEnchant extends ScriptAction {
     @Override
     public void onInit() {
         this.context.getCore().registerScriptAction(this);
+    }
+
+    private static int parseOption(String[] params) throws IllegalArgumentException {
+        if (params == null || params.length == 0) {
+            throw new IllegalArgumentException(
+                    "Faltando parametro de encantamento, deve ser 1, 2 ou 3.");
+        }
+
+        int option = Integer.parseInt(params[0].trim());
+
+        if (option < 1 || option > 3) {
+            throw new IllegalArgumentException(
+                    "Opcao de encantamento invalida: " + option);
+        }
+
+        return option;
     }
 }
