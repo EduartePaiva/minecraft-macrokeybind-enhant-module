@@ -7,3 +7,5 @@ gradle wrapper --gradle-version 4.9
 
 gradle na versão 4.9
 jdk versão 8
+
+Compile with docker: docker compose run --rm builder

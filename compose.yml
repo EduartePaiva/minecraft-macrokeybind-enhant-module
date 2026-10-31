@@ -1,0 +1,10 @@
+services:
+  builder:
+    image: eclipse-temurin:8-jdk
+    working_dir: /app
+    command: ["sh", "gradlew", "clean", "build", "--no-daemon"]
+    volumes:
+      - .:/app
+      - gradle-cache:/root/.gradle
+volumes:
+  gradle-cache:
