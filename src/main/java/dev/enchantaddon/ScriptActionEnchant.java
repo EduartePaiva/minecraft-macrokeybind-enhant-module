@@ -22,6 +22,7 @@ public class ScriptActionEnchant extends ScriptAction {
     }
 
     private static final String MINECRAFT_CLASS = "net.minecraft.client.Minecraft";
+
     private static final String MINECRAFT_CLASS_GET_FUNC = "func_71410_x";
 
     private static final String PLAYER_CONTROLLER_CLASS = "net.minecraft.client.multiplayer.PlayerControllerMP";
@@ -59,7 +60,6 @@ public class ScriptActionEnchant extends ScriptAction {
             // Ensure an enchantment table is open
             if (!container.getClass().getName().equals(
                     ENCHANTMENT_CONTAINER_CLASS)) {
-                provider.actionAddChatMessage("Mesa de encantamento não está aberta");
                 return null;
             }
 
@@ -84,8 +84,6 @@ public class ScriptActionEnchant extends ScriptAction {
 
             enchantMethod.setAccessible(true);
             enchantMethod.invoke(controller, windowId, option - 1);
-
-            provider.actionAddChatMessage("Encantamento: " + option);
 
         } catch (Exception e) {
             provider.actionAddChatMessage("Error: " + e);
