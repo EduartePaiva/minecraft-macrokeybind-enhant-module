@@ -5,8 +5,9 @@ Módulo testado na versão 1.8 do minecraft, em específico no SLEEP ModPack
 
 ## instalação
 
-baixe o arquivo e coloque na pasta ``liteconfig/common/macros/modules``.  
-Se não encontrar esta pasta modules ela está sempre na pasta de macros, onde seus macros são salvos.
+- baixe o arquivo [baixar última versão](https://github.com/EduartePaiva/minecraft-macrokeybind-enhant-module/releases/latest)
+- coloque na pasta ``liteconfig/common/macros/modules``.  
+- Se não encontrar esta pasta modules ela está sempre na pasta de macros, onde seus macros são salvos.
 
 ## Utilizando
 
